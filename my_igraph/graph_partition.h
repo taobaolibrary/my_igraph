@@ -14,7 +14,6 @@ typedef struct Mysubgraph
 }Mysubgraph;
 
 
-
 // graph是初始化过的图，该函数只是生成一个映射自身的图，包装成Mysubgraph类型
 // 记得释放subgraph对象内存
 int init_mysubgraph(Mysubgraph *graph, const igraph_bool_t directed);
