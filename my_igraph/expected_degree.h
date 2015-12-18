@@ -6,6 +6,103 @@
 #include <iostream>
 #include <assert.h>  
 
+// 图的期望密度
+int graph_expected_density(const igraph_t *graph, igraph_real_t *res,
+	const igraph_vs_t vids, igraph_neimode_t mode,
+	igraph_bool_t loops, const igraph_vector_t *expected_edge) {
+
+	long int no_of_nodes = igraph_vcount(graph);
+	igraph_vit_t vit;
+	long int no_vids;
+	igraph_vector_t neis;
+	long int i;
+	std::set<long int> myset;
+	myset.clear();
+
+
+	//if (!expected_edge)
+	//return igraph_degree(graph, res, vids, mode, loops);
+
+	if (igraph_vector_size(expected_edge) != igraph_ecount(graph)) {
+		IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+	}
+
+	if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+		IGRAPH_ERROR("degree calculation failed", IGRAPH_EINVMODE);
+	}
+
+	if (!igraph_is_directed(graph)) {
+		mode = IGRAPH_ALL;
+	}
+
+	IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+	IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+	IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+	IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+	no_vids = IGRAPH_VIT_SIZE(vit);
+
+	// 如果子图没有节点
+	if (no_vids == 0) {
+		*res = IGRAPH_NAN;
+		return 0;
+	}
+
+	IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+	IGRAPH_CHECK(igraph_vector_reserve(&neis, no_of_nodes));
+	// 	IGRAPH_CHECK(igraph_vector_resize(res, no_vids));
+	// 	igraph_vector_null(res);
+
+	if (loops) {
+		for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+			long int vid = IGRAPH_VIT_GET(vit);
+			long int j, n;
+			IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t)vid, mode));
+			n = igraph_vector_size(&neis);
+			for (j = 0; j < n; j++) {
+				long int edge = (long int)VECTOR(neis)[j];
+				//VECTOR(*res)[i] += VECTOR(*expected_edge)[edge];
+				// 使用集合存储边进行去重
+				myset.insert(edge);
+			}
+		}
+	}
+	else {
+		for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+			long int vid = IGRAPH_VIT_GET(vit);
+			long int j, n;
+			IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t)vid, mode));
+			n = igraph_vector_size(&neis);
+			for (j = 0; j < n; j++) {
+				long int edge = (long int)VECTOR(neis)[j];
+				long int from = IGRAPH_FROM(graph, edge);
+				long int to = IGRAPH_TO(graph, edge);
+				if (from != to) {
+					//VECTOR(*res)[i] += VECTOR(*expected_edge)[edge];
+					// 使用集合存储边进行去重
+					myset.insert(edge);
+				}
+			}
+		}
+	}
+
+	*res = 0;
+	// 计算集合中边的期望边权和
+	for each (long int edge in myset)
+	{
+		*res += VECTOR(*expected_edge)[edge];
+	}
+
+	*res = *res / no_vids;
+
+	myset.clear();
+	igraph_vit_destroy(&vit);
+	igraph_vector_destroy(&neis);
+	IGRAPH_FINALLY_CLEAN(2);
+	return 0;
+}
+
+
 int igraph_edges_expected(const igraph_t *graph, igraph_vector_t *res) {
 	igraph_vector_t weights;
 	igraph_vector_t probabilitys;
