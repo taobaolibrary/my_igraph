@@ -4,12 +4,12 @@
 #include <stdio.h>
 #include <iostream>
 #include <assert.h>  
+#include <set>
 #include "mystr.h"
 #include "read_data.h"
 #include "expected_degree.h"
 
 using namespace std;
-
 
 void print_vector(igraph_vector_t *v, FILE *f) {
 	long int i;
@@ -58,6 +58,11 @@ int main()
 
 	vertice_expected_degree(&g, &expected_degrees, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS);
 	print_vector(&expected_degrees, stdout);
+
+	igraph_real_t g_density = 0;
+	graph_expected_density(&g, &g_density, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, &expected_edges);
+	printf("density:%f\n",g_density);
+
 
 	// oldwarnhandler = igraph_set_warning_handler(null_warning_handler);
 	// igraph_write_graph_gml(&g, stdout, 0, "");
