@@ -194,8 +194,8 @@ int main()
 	igraph_t g;
 	igraph_vector_t expected_edges;
 	igraph_vector_t expected_degrees;
-	igraph_vector_t weights;
-	igraph_vector_t probabilitys;
+	//igraph_vector_t weights;
+//	igraph_vector_t probabilitys;
 	igraph_warning_handler_t* oldwarnhandler;
 
 	FILE *input;
@@ -236,11 +236,11 @@ int main()
 	Mysubgraph subg0;
 	Mysubgraph subg_next;
 	igraph_vector_t rm_vertice;
-	igraph_vector_t n_d;
-	igraph_strvector_t node_names;
-	char * s;
+//	igraph_vector_t n_d;
+//	igraph_strvector_t node_names;
+//	char * s;
 
-	igraph_vector_init_int(&rm_vertice, 1, 172);
+	igraph_vector_init_int(&rm_vertice, 1, 0);
 	
 // 	igraph_vector_init(&n_d, 1);
 // 	igraph_degree(&g, &n_d, igraph_vss_all(), IGRAPH_ALL, 0);
@@ -252,9 +252,11 @@ int main()
 // 		igraph_strvector_get(&node_names, i, &s);
 // 		if (strcmp("HHT1", s) == 0)
 // 		{
-// 			printf("HHT1 : %d\n", i);
+// 			printf("HHT1 : %d\n", i);
+
 // 		}
-// 	}
+// 	}
+
 
 //	printf("%s\n", VAS(&g, "vname", 2039));
 
@@ -298,6 +300,16 @@ int main()
 
 	// oldwarnhandler = igraph_set_warning_handler(null_warning_handler);
 	// igraph_write_graph_gml(&g, stdout, 0, "");
+
+	igraph_destroy(&g);
+	igraph_vector_destroy(&expected_edges);
+	igraph_vector_destroy(&expected_degrees);
+//  igraph_vector_destroy(&weights);
+//	igraph_vector_destroy(&probabilitys);
+	igraph_vector_destroy(&rm_vertice);
+//	igraph_strvector_destroy(&node_names);
+	//destroy_mysubgraph(&subg0);
+	//destroy_mysubgraph(&subg_next);
 
 	fclose(input);
 	return 0;
