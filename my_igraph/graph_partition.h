@@ -35,7 +35,9 @@ int init_mysubgraph(Mysubgraph *graph, const igraph_bool_t directed)
 {
 	if (graph == NULL)
 	{
-		graph = (Mysubgraph*)malloc(sizeof(Mysubgraph));
+		//graph = (Mysubgraph*)malloc(sizeof(Mysubgraph));
+		printf("graph cann't null in init_mysubgraph\n");
+		return 1;
 	}
 
 	graph->graph = (igraph_t*)malloc(sizeof(igraph_t));
@@ -90,7 +92,7 @@ int subgraph_removeVetices(const Mysubgraph  *g, const igraph_vector_t *vertices
 
 	igraph_vector_init(&keep, 0);
 
-	if (igraph_vector_tail(&rm_vertice) >= no_node || VECTOR(rm_vertice)[0] < 0)
+	if (igraph_vector_tail(&rm_vertice) >= no_node || igraph_vector_size(&rm_vertice)>0&&VECTOR(rm_vertice)[0] < 0)
 	{
 		printf("invalid vertice id to remove\n");
 		return 2;
@@ -99,7 +101,7 @@ int subgraph_removeVetices(const Mysubgraph  *g, const igraph_vector_t *vertices
 	int j = 0;
 	for (long int i = 0; i < no_node; i++)
 	{
-		if ((long)VECTOR(rm_vertice)[j] == i)
+		if (j < igraph_vector_size(&rm_vertice) && (long)VECTOR(rm_vertice)[j] == i)
 		{
 			j++;
 			continue;
@@ -116,9 +118,13 @@ int subgraph_removeVetices(const Mysubgraph  *g, const igraph_vector_t *vertices
 	// 上面得出的invmap是到g的映射，需要根据g->invmap进行映射转换，映射到最初的图。 
 	for (int i = 0; i < igraph_vector_size(res->invmap); i++)
 	{
-		long int pre = VECTOR(*(res->invmap))[i];
+		long int pre = (long int)VECTOR(*(res->invmap))[i];
 		VECTOR(*(res->invmap))[i] = VECTOR(*(g->invmap))[pre];
 	}
+
+	igraph_vector_destroy(&ig_map);
+	igraph_vector_destroy(&keep);
+	igraph_vector_destroy(&rm_vertice);
 
 	return 0;
 }

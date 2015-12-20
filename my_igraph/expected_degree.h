@@ -98,7 +98,7 @@ int graph_expected_density(const igraph_t *graph, igraph_real_t *res,
 	myset.clear();
 	igraph_vit_destroy(&vit);
 	igraph_vector_destroy(&neis);
-	IGRAPH_FINALLY_CLEAN(2);
+	IGRAPH_FINALLY_CLEAN(3);
 	return 0;
 }
 
@@ -276,7 +276,7 @@ int vertice_expected_degree(const igraph_t *graph, igraph_vector_t *res,
 
 	igraph_vit_destroy(&vit);
 	igraph_vector_destroy(&neis);
-	IGRAPH_FINALLY_CLEAN(2);
+	IGRAPH_FINALLY_CLEAN(3);
 
 	return 0;
 }
