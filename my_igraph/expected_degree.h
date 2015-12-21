@@ -6,7 +6,9 @@
 #include <iostream>
 #include <assert.h>  
 
-// 图的期望密度
+// 图的期望密度，可优化
+// vids中的节点如果看做是子图节点（原图的部分节点），graph是原图，那么求取的是保留那些不属于子图，但与子图相连的边。在此基础上求子图期望密度
+// vids中的节点是子图的全部节点，graph也是子图，那么忽略了保留那些不属于子图，但与子图相连的边。在此基础上求子图期望密度
 int graph_expected_density(const igraph_t *graph, igraph_real_t *res,
 	const igraph_vs_t vids, igraph_neimode_t mode,
 	igraph_bool_t loops, const igraph_vector_t *expected_edge) {
@@ -34,9 +36,6 @@ int graph_expected_density(const igraph_t *graph, igraph_real_t *res,
 	if (!igraph_is_directed(graph)) {
 		mode = IGRAPH_ALL;
 	}
-
-	IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
-	IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
 	IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
 	IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -98,7 +97,7 @@ int graph_expected_density(const igraph_t *graph, igraph_real_t *res,
 	myset.clear();
 	igraph_vit_destroy(&vit);
 	igraph_vector_destroy(&neis);
-	IGRAPH_FINALLY_CLEAN(3);
+	IGRAPH_FINALLY_CLEAN(2);
 	return 0;
 }
 
@@ -142,6 +141,8 @@ int igraph_edges_expected(const igraph_t *graph, igraph_vector_t *res) {
 	return 0;
 }
 
+// vids中的节点如果看做是子图节点（原图的部分节点），graph是原图，那么求取的是保留那些不属于子图，但与子图相连的边。在此基础上求子图期望度数
+// vids中的节点是子图的全部节点，graph也是子图，那么忽略了保留那些不属于子图，但与子图相连的边。在此基础上求子图期望度数
 int vertice_expected_degree(const igraph_t *graph, igraph_vector_t *res,
 	const igraph_vs_t vids, igraph_neimode_t mode,
 	igraph_bool_t loops, const igraph_vector_t *weights, const igraph_vector_t *probabilitys) {
