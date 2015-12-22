@@ -132,7 +132,7 @@ int fast_densestSubgraph(const Mysubgraph *subgraph, Mysubgraph *res, igraph_rea
 	return 0;
 }
 
-// 对节点子集求稠密子图
+// 对节点子集求稠密子图，图的期望密度和节点的期望度数都考虑保留边
 int fast_densestSubgraph2(const Mysubgraph *subgraph, const igraph_vector_t *vertices,
 	Mysubgraph *res, igraph_real_t *subg_density, igraph_vector_t *res_keepv)
 {
@@ -281,5 +281,7 @@ int fast_densestSubgraph2(const Mysubgraph *subgraph, const igraph_vector_t *ver
 	destroy_mysubgraph(&max_dentity_subg);
 	return 0;
 }
+
+
 
 #endif // !FAST_DENSESTSUBGRAPH_H
