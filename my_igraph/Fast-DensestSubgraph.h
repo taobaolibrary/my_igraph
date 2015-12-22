@@ -36,6 +36,8 @@ int mysubgraph_copy(Mysubgraph *to, Mysubgraph *from)
 	// 这里出错，由于传入前to中的graph和invmap未初始化。现以纠正
 	igraph_copy(to->graph, from->graph);
 	igraph_vector_copy(to->invmap, from->invmap);
+	igraph_vector_copy(to->map_next, from->map_next);
+	igraph_vector_copy(to->map_pre, from->map_pre);
 	return 0;
 }
 
@@ -145,6 +147,7 @@ int fast_densestSubgraph2(const Mysubgraph *subgraph, const igraph_vector_t *ver
 	igraph_real_t max_density = -1;
 	igraph_vector_t keep;
 	igraph_vector_t keep2;
+	igraph_vector_t max_density_keep_v;
 
 	if (subgraph == NULL || subgraph->graph == NULL || subgraph->invmap == NULL || vertices == NULL)
 	{
@@ -157,6 +160,7 @@ int fast_densestSubgraph2(const Mysubgraph *subgraph, const igraph_vector_t *ver
 	init_mysubgraph(&max_dentity_subg, subgraph->graph->directed);
 	init_mysubgraph(res, subgraph->graph->directed);
 
+	igraph_vector_init(&max_density_keep_v, 0);
 	igraph_vector_init(&keep, 0);
 	igraph_vector_copy(&keep, vertices);
 
@@ -198,6 +202,10 @@ int fast_densestSubgraph2(const Mysubgraph *subgraph, const igraph_vector_t *ver
 		{
 			max_density = density_cur;
 			mysubgraph_copy(&max_dentity_subg, &subg_cur);
+			igraph_vector_resize(&max_density_keep_v, igraph_vector_size(&keep));
+			igraph_vector_copy(&max_density_keep_v, &keep);
+			//printf("max_density : %f\n", max_density);
+			//printf("max_keep : %d\n", igraph_vector_size(&keep));
 		}
 
 
@@ -219,13 +227,12 @@ int fast_densestSubgraph2(const Mysubgraph *subgraph, const igraph_vector_t *ver
 		}
 
 		subgraph_removeVetices2(&subg_cur, &rm_vertice, &subg_next);
-		//		printf("%d %d\n", (int)igraph_vcount(subg_next.graph), (int)igraph_ecount(subg_next.graph));
+		//printf("%d %d\n", (int)igraph_vcount(subg_next.graph), (int)igraph_ecount(subg_next.graph));
 
 		// swap大小要相同
 		//igraph_vector_reserve(&keep, igraph_vector_size(&keep2));
 		//igraph_vector_copy(&keep, &keep2);
 		// 将父图节点编号转化为子图节点编号
-
 		int cnt = 0;
 		igraph_vector_init(&keep2, 0);
 		for (int i = 0; i < igraph_vector_size(&keep); i++)
@@ -241,6 +248,7 @@ int fast_densestSubgraph2(const Mysubgraph *subgraph, const igraph_vector_t *ver
 				igraph_vector_push_back(&keep2, cur_vid);
 		}
 		//printf("rm:%d\n",cnt);
+		//printf("density : %f\n", density_cur);
 
 		igraph_vector_resize(&keep, igraph_vector_size(&keep2));
 		igraph_vector_copy(&keep, &keep2);
@@ -249,10 +257,14 @@ int fast_densestSubgraph2(const Mysubgraph *subgraph, const igraph_vector_t *ver
 	}
 
 
+	//printf("keep : %d\n", igraph_vector_size(&max_density_keep_v));
+
+	//igraph_vector_print(&max_density_keep_v);
+
 	if (res_keepv != NULL)
 	{
-		igraph_vector_reserve(res_keepv, igraph_vector_size(&keep));
-		igraph_vector_copy(res_keepv, &keep);
+		igraph_vector_reserve(res_keepv, igraph_vector_size(&max_density_keep_v));
+		igraph_vector_copy(res_keepv, &max_density_keep_v);
 	}
 	mysubgraph_copy(res, &max_dentity_subg);
 	*subg_density = max_density;
@@ -260,6 +272,7 @@ int fast_densestSubgraph2(const Mysubgraph *subgraph, const igraph_vector_t *ver
 
 	igraph_vector_destroy(&keep);
 	igraph_vector_destroy(&keep2);
+	igraph_vector_destroy(&max_density_keep_v);
 	igraph_vector_destroy(&expected_edges);
 	igraph_vector_destroy(&expected_degrees);
 	igraph_vector_destroy(&rm_vertice);
@@ -268,7 +281,5 @@ int fast_densestSubgraph2(const Mysubgraph *subgraph, const igraph_vector_t *ver
 	destroy_mysubgraph(&max_dentity_subg);
 	return 0;
 }
-
-
 
 #endif // !FAST_DENSESTSUBGRAPH_H

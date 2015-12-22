@@ -343,9 +343,11 @@ int main()
 	igraph_real_t density = 0;
 	fast_densestSubgraph(&subg0, &subg_next, &density);
 	
+	//printf("hsize :¡¡%d\n", igraph_vcount(subg_next.graph));
+
 	igraph_vector_t keep;
 	igraph_vector_init(&keep, 0);
-	for (int i = 0; i < igraph_vcount(subg0.graph); i++){
+	for (int i = 5; i < igraph_vcount(subg0.graph) - 5; i++){
 		igraph_vector_push_back(&keep, i);
 	}
 

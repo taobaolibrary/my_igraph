@@ -40,6 +40,7 @@ int graph_expected_density(const igraph_t *graph, igraph_real_t *res,
 	IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
 	IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 	no_vids = IGRAPH_VIT_SIZE(vit);
+	//printf("no_vids : %d\n", no_vids);
 
 	// 如果子图没有节点
 	if (no_vids == 0) {
@@ -92,7 +93,9 @@ int graph_expected_density(const igraph_t *graph, igraph_real_t *res,
 		*res += VECTOR(*expected_edge)[edge];
 	}
 
+	//float sum = *res;
 	*res = *res / no_vids;
+	//printf("vc : %d ec : %d sum : %f\n", no_vids, myset.size(), sum);
 
 	myset.clear();
 	igraph_vit_destroy(&vit);
