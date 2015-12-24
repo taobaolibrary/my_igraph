@@ -3,6 +3,7 @@
 
 #include <set>
 #include <vector>
+#include <algorithm>
 #include "mystr.h"
 #include "read_data.h"
 #include "expected_degree.h"
@@ -55,6 +56,33 @@ int init_mysubgraph(Mysubgraph *graph, const igraph_bool_t directed)
 	igraph_vector_init(graph->map_pre, 0);
 	igraph_vector_init(graph->map_next, 0);
 	igraph_empty(graph->graph, 0, directed);
+	return 0;
+}
+
+int mysubgraph_empty(Mysubgraph *graph, const igraph_bool_t directed)
+{
+	if (graph == NULL)
+	{
+		return 1;
+	}
+	if (graph->graph != NULL)
+	{
+		igraph_empty(graph->graph, 0, directed);
+	}
+	if (graph->invmap != NULL)
+	{
+		igraph_vector_resize(graph->invmap, 0);
+	}
+	if (graph->map_next != NULL)
+	{
+		igraph_vector_resize(graph->map_next, 0);
+
+	}
+	if (graph->map_pre != NULL)
+	{
+		igraph_vector_resize(graph->map_pre, 0);
+
+	}
 	return 0;
 }
 
@@ -203,6 +231,77 @@ int subgraph_removeVetices2(const Mysubgraph  *g, const igraph_vector_t *vertice
 	igraph_vector_destroy(&rm_vertice);
 	return 0;
 }
+
+
+int vecint_union(std::vector<int> v1, std::vector<int> v2, std::vector<int> *res)
+{
+	if (res == NULL)
+	{
+		return 1;
+	}
+	res->resize(v1.size() + v2.size());
+	std::vector<int>::iterator it;
+	std::sort(v1.begin(), v1.end());
+	std::sort(v2.begin(), v2.end());
+	it = std::set_union(v1.begin(), v1.end(),
+		v2.begin(), v2.end(), res->begin());
+	res->resize(it - res->begin());
+	return 0;
+}
+
+int vertices_remain(std::vector<int> v1, int no_node, std::vector<int> *res)
+{
+	if (res == NULL)
+	{
+		return 1;
+	}
+	res->clear();
+	sort(v1.begin(), v1.end());
+	int j = 0;
+	for (int i = 0; i < no_node; i++)
+	{
+		if (j < v1.size() && i == v1[i])
+		{
+			j++;
+			continue;
+		}
+		res->push_back(i);
+	}
+
+	return 0;
+}
+
+int vertices_rm(int no_nodes, const igraph_vector_t keep, igraph_vector_t *res)
+{
+	igraph_vector_bool_t real_keep_flag;
+	if (res == NULL)
+	{
+		return 1;
+	}
+	igraph_vector_init(res, 0);
+	igraph_vector_bool_init(&real_keep_flag, no_nodes);
+	igraph_vector_bool_null(&real_keep_flag);
+	igraph_vector_init(res, 0);
+
+	// 确定真实要删除的节点
+	for (int i = 0; i < igraph_vector_size(&keep); i++)
+	{
+		int vid = VECTOR(keep)[i];
+		VECTOR(real_keep_flag)[vid] = 1;
+	}
+
+	for (int i = 0; i < no_nodes; i++)
+	{
+		if (VECTOR(real_keep_flag)[i] == 0)
+		{
+			igraph_vector_push_back(res, i);
+		}
+	}
+
+	igraph_vector_bool_destroy(&real_keep_flag);
+	return 0;
+}
+
 
 #endif // !1
 

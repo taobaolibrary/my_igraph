@@ -93,9 +93,9 @@ int graph_expected_density(const igraph_t *graph, igraph_real_t *res,
 		*res += VECTOR(*expected_edge)[edge];
 	}
 
-	//float sum = *res;
+	float sum = *res;
 	*res = *res / no_vids;
-	//printf("vc : %d ec : %d sum : %f\n", no_vids, myset.size(), sum);
+	// printf("vc : %d ec : %d sum : %f\n", no_vids, myset.size(), sum);
 
 	myset.clear();
 	igraph_vit_destroy(&vit);
