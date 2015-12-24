@@ -43,21 +43,21 @@ int main()
 	// expected_edges使用前必须初始化
 	igraph_vector_init(&expected_edges, igraph_ecount(&g));
 	igraph_edges_expected(&g, &expected_edges);
-	print_vector(&expected_edges,stdout);
+	//print_vector(&expected_edges,stdout);
 
 	igraph_vector_init(&expected_degrees, igraph_ecount(&g));
 	vertice_expected_degree(&g, &expected_degrees, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, &expected_edges);
-	print_vector(&expected_degrees, stdout);
+	//print_vector(&expected_degrees, stdout);
 
 	igraph_vector_init(&weights, igraph_ecount(&g));
 	igraph_vector_init(&probabilitys, igraph_ecount(&g));
 	EANV(&g, "weights", &weights);
 	EANV(&g, "probabilitys", &probabilitys);
 	vertice_expected_degree(&g, &expected_degrees, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, &weights, &probabilitys);
-	print_vector(&expected_degrees, stdout);
+	//print_vector(&expected_degrees, stdout);
 
 	vertice_expected_degree(&g, &expected_degrees, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS);
-	print_vector(&expected_degrees, stdout);
+	//print_vector(&expected_degrees, stdout);
 
 	igraph_real_t g_density = 0;
 	graph_expected_density(&g, &g_density, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, &expected_edges);

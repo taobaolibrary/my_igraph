@@ -230,6 +230,16 @@ int main()
 // 	print_vector(&expected_degrees, stdout);
 
 	igraph_real_t g_density = 0;
+	igraph_vector_t keep_v;
+	igraph_vector_init(&keep_v, 2);
+	VECTOR(keep_v)[0] = 0;
+	VECTOR(keep_v)[1] = 2;
+//	graph_expected_density(&g, &g_density, igraph_vss_vector(&keep_v), IGRAPH_OUT, IGRAPH_NO_LOOPS, &expected_edges);
+//	printf("density:%f\n", g_density);
+
+//	vertice_expected_degree(&g, &expected_degrees, igraph_vss_vector(&keep_v), IGRAPH_OUT, IGRAPH_NO_LOOPS, &expected_edges);
+//	igraph_vector_print(&expected_degrees);
+
 	graph_expected_density(&g, &g_density, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, &expected_edges);
 	printf("density:%f\n", g_density);
 
@@ -275,7 +285,7 @@ int main()
 
 
 	oldwarnhandler = igraph_set_warning_handler(null_warning_handler);
-	/*igraph_write_graph_gml(&g, stdout, 0, "");*/
+	igraph_write_graph_gml(&g, stdout, 0, "");
 
 	init_mysubgraph(&g, &subg0);
 
