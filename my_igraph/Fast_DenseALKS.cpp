@@ -15,7 +15,7 @@
 #include "CTimer.h"
 #include <algorithm>
 #include <iterator>
-#include "print_graph_4col.h"
+#include "print_graph.h"
 
 
 using namespace std;
@@ -225,7 +225,7 @@ int main()
 	//	igraph_vector_t weights;
 	//	igraph_vector_t probabilitys;
 	Mysubgraph subg0;
-	//	igraph_warning_handler_t* oldwarnhandler;
+	igraph_warning_handler_t* oldwarnhandler;
 
 	FILE *input = NULL;
 	FILE *file_desity_graph = NULL;
@@ -261,17 +261,21 @@ int main()
 	double a1, b1;
 	a1 = clock();
 	Fast_DenseALKS(&g, 100, &subg_next, &density);
+	printf("vsize : %d density : %f\n", igraph_vcount(subg_next.graph), density);
 	b1 = clock();
 	printf("\n-----\nclock:%lfs\n", (b1 - a1) / CLOCKS_PER_SEC);
 
-	file_desity_graph = fopen("density_subgraph.txt", "w");
+	//file_desity_graph = fopen("result\\density_subgraph_edges.txt", "w");
+	file_desity_graph = fopen("result\\density_subgraph.gml", "w");
 	// input = fopen("to_TAP_core.txt", "r");
 	if (file_desity_graph == NULL)
 	{
 		printf("read file error");
 		return 1;
 	}
-	print_data_4col(file_desity_graph, subg_next.graph);
+	//print_data_4col(file_desity_graph, subg_next.graph);
+	oldwarnhandler = igraph_set_warning_handler(null_warning_handler);
+	igraph_write_graph_gml(subg_next.graph, file_desity_graph, 0, "");
 
 	igraph_destroy(&g);
 

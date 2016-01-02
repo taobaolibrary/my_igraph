@@ -82,7 +82,7 @@ int init_graph(igraph_t *g, std::vector<std::string> edges,
 	// 初始化图节点
 	igraph_empty(g, vmap.size(), directed);
 	for each (std::pair<std::string, int> var in vmap){
-		SETVAS(g, "vname", (int)var.second, var.first.data());
+		SETVAS(g, "name", (int)var.second, var.first.data());
 	}
 
 	// 将节点的名字编号
