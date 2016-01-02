@@ -15,6 +15,8 @@
 #include "CTimer.h"
 #include <algorithm>
 #include <iterator>
+#include "print_graph_4col.h"
+
 
 using namespace std;
 
@@ -206,8 +208,6 @@ int fast_densestSubgraph4(const Mysubgraph *subgraph, const igraph_vector_t *ver
 */
 
 
-
-
 // 这里经常使用集合并差集，所以使用c++的集合运算
 // 考虑保留边
 
@@ -227,7 +227,8 @@ int main()
 	Mysubgraph subg0;
 	//	igraph_warning_handler_t* oldwarnhandler;
 
-	FILE *input;
+	FILE *input = NULL;
+	FILE *file_desity_graph = NULL;
 	/* Same graph, but forcing undirected mode */
 	input = fopen("mydata.txt", "r");
 	// input = fopen("to_TAP_core.txt", "r");
@@ -263,6 +264,15 @@ int main()
 	b1 = clock();
 	printf("\n-----\nclock:%lfs\n", (b1 - a1) / CLOCKS_PER_SEC);
 
+	file_desity_graph = fopen("density_subgraph.txt", "w");
+	// input = fopen("to_TAP_core.txt", "r");
+	if (file_desity_graph == NULL)
+	{
+		printf("read file error");
+		return 1;
+	}
+	print_data_4col(file_desity_graph, subg_next.graph);
+
 	igraph_destroy(&g);
 
 	destroy_mysubgraph(&subg_next);
@@ -270,5 +280,6 @@ int main()
 	igraph_vector_destroy(&expected_edges);
 	igraph_vector_destroy(&expected_degrees);
 	fclose(input);
+	fclose(file_desity_graph);
 	return 0;
 }

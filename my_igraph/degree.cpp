@@ -40,6 +40,8 @@ int main()
 
 	init_mygraph(input, &g, 0);
 
+	printf("vc : %d ec : %d\n", igraph_vcount(&g), igraph_ecount(&g));
+
 	// expected_edges使用前必须初始化
 	igraph_vector_init(&expected_edges, igraph_ecount(&g));
 	igraph_edges_expected(&g, &expected_edges);
