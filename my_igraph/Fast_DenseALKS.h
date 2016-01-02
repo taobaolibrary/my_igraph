@@ -11,16 +11,21 @@
 #include "read_data.h"
 #include "expected_degree.h"
 #include "graph_partition.h"
+#include "print_graph.h"
 #include "Fast-DensestSubgraph.h"
 #include <algorithm>
 #include <iterator>
+#include <string>
+#include <sstream>
 
-int dense_vertivce(const Mysubgraph *origal_graph, const std::vector< std::vector<int> > *subg_vvec, const int in_gsize, Mysubgraph *res)
+int dense_vertivce(const Mysubgraph *origal_graph, const std::vector< std::vector<int> > *subg_vvec, const int in_gsize 
+	,Mysubgraph *res, std::vector< std::vector<int> > *out_subg_vvec_kv = NULL)
 {
 	if (origal_graph == NULL || subg_vvec == NULL || res == NULL)
 	{
 		return 1;
 	}
+
 	long int no_node = igraph_vcount(origal_graph->graph);
 	long int no_edge = igraph_ecount(origal_graph->graph);
 	igraph_vector_t remain_vertices;
@@ -77,6 +82,11 @@ int dense_vertivce(const Mysubgraph *origal_graph, const std::vector< std::vecto
 	}
 
 
+	for each (std::vector<int> vvec in subg_vvec_kv)
+	{
+		printf("vsize :%d\n", vvec.size());
+	}
+
 	printf("-----------------------\n");
 	// 获取期望密度最大的k稠密子图
 	igraph_real_t density;
@@ -93,11 +103,12 @@ int dense_vertivce(const Mysubgraph *origal_graph, const std::vector< std::vecto
 		}
 		vertices_rm(no_node, remain_vertices, &rm_vertices);
 		subgraph_removeVetices2(origal_graph, &rm_vertices, &subg);
+		
 
 		igraph_edges_expected(subg.graph, &expected_edges);
 		graph_expected_density(subg.graph, &density, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, &expected_edges);
 
-		printf("density : %f\n", density);
+		printf("vsize : %d density : %f\n", igraph_vcount(subg.graph), density);
 		if (density > max_density)
 		{
 			max_density = density;
@@ -134,11 +145,22 @@ int dense_vertivce(const Mysubgraph *origal_graph, const std::vector< std::vecto
 		igraph_edges_expected(subg.graph, &expected_edges);
 		graph_expected_density(subg.graph, &density, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, &expected_edges);
 
-		printf("density : %f\n", density);
+		printf("vsize : %d density : %f\n", igraph_vcount(subg.graph), density);
 		mysubgraph_empty(&subg, directed);
 	}
 
 	mysubgraph_copy(res, &subg_max_density);
+
+	// 返回节点列表
+	if (out_subg_vvec_kv != NULL)
+	{
+		out_subg_vvec_kv->clear();
+		for each (std::vector<int> vvec_kv in subg_vvec_kv)
+		{
+			std::vector<int> tmp(vvec_kv.begin(), vvec_kv.end());
+			out_subg_vvec_kv->push_back(vvec_kv);
+		}
+	}
 
 	// 释放内存
 	for (int subg_th = 0; subg_th < subg_vvec_kv.size(); subg_th++)
@@ -157,6 +179,7 @@ int dense_vertivce(const Mysubgraph *origal_graph, const std::vector< std::vecto
 	return 0;
 }
 
+// subg_density暂时还没返回值
 int Fast_DenseALKS(const igraph_t *input_graph, const int in_gsize, Mysubgraph *res, igraph_real_t *subg_density)
 {
 	// 存放稠密子图节点
@@ -176,8 +199,6 @@ int Fast_DenseALKS(const igraph_t *input_graph, const int in_gsize, Mysubgraph *
 	igraph_vector_t cur_keepv;
 	igraph_vector_t cur_density_vertices;
 	igraph_vector_t rm_vertices;
-
-
 
 	if (input_graph == NULL)
 	{
@@ -259,7 +280,7 @@ int Fast_DenseALKS(const igraph_t *input_graph, const int in_gsize, Mysubgraph *
 
 		printf("cur_density : %f\n", cur_density);
 		printf("times : %d hsize : %d hkeepvsize : %d\n", times,
-			igraph_vcount(cur_density_subg.graph), igraph_vector_size(&cur_density_vertices));
+		igraph_vcount(cur_density_subg.graph), igraph_vector_size(&cur_density_vertices));
 
 
 		// 将这次的稠密子图节点集合与上次的图节点集合并
@@ -317,7 +338,10 @@ int Fast_DenseALKS(const igraph_t *input_graph, const int in_gsize, Mysubgraph *
 	// 	vecint_union(subg_vpre, subg_vcur, &subg_next);
 	// 	subg_vec.push_back(subg_next);
 
-	dense_vertivce(&origal_graph, &subg_vvec, in_gsize, res);
+	dense_vertivce(&origal_graph, &subg_vvec, in_gsize, res, &subg_vec_kv);
+	print_each_graph(&origal_graph, &subg_vvec, "result\\original_dense_", "gml");
+	print_each_graph(&origal_graph, &subg_vec_kv, "result\\dense_", "gml");
+
 
 	igraph_vector_destroy(&cur_keepv);
 	destroy_mysubgraph(&origal_graph);
@@ -326,6 +350,7 @@ int Fast_DenseALKS(const igraph_t *input_graph, const int in_gsize, Mysubgraph *
 	return 0;
 }
 
+// subg_density暂时还没返回值
 int Fast_DenseALKS2(const igraph_t *input_graph, const int in_gsize, Mysubgraph *res, igraph_real_t *subg_density)
 {
 	// 存放稠密子图节点
@@ -472,8 +497,6 @@ int Fast_DenseALKS2(const igraph_t *input_graph, const int in_gsize, Mysubgraph 
 	destroy_mysubgraph(&cur_subg);
 	return 0;
 }
-
-
 
 
 #endif // !FAST_DENSEALKS_H
