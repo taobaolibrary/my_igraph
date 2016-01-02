@@ -18,7 +18,7 @@
 #include <string>
 #include <sstream>
 
-int dense_vertivce(const Mysubgraph *origal_graph, const std::vector< std::vector<int> > *subg_vvec, const int in_gsize 
+int max_dense_kv_subg(const Mysubgraph *origal_graph, const std::vector< std::vector<int> > *subg_vvec, const int in_gsize
 	,Mysubgraph *res, std::vector< std::vector<int> > *out_subg_vvec_kv = NULL)
 {
 	if (origal_graph == NULL || subg_vvec == NULL || res == NULL)
@@ -338,7 +338,7 @@ int Fast_DenseALKS(const igraph_t *input_graph, const int in_gsize, Mysubgraph *
 	// 	vecint_union(subg_vpre, subg_vcur, &subg_next);
 	// 	subg_vec.push_back(subg_next);
 
-	dense_vertivce(&origal_graph, &subg_vvec, in_gsize, res, &subg_vec_kv);
+	max_dense_kv_subg(&origal_graph, &subg_vvec, in_gsize, res, &subg_vec_kv);
 	print_each_graph(&origal_graph, &subg_vvec, "result\\original_dense_", "gml");
 	print_each_graph(&origal_graph, &subg_vec_kv, "result\\dense_", "gml");
 
